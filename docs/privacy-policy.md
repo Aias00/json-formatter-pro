@@ -30,4 +30,4 @@ All executable code is packaged with the extension. No remote scripts or remote 
 
 ## Contact
 
-For privacy questions, contact: <your-support-email>
+For privacy questions, contact: aiasdream94@gmail.com
