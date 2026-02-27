@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Formatter Pro</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">{}</span>
+        <div class="brand-text">
+          <h1 class="title">JSON Formatter Pro</h1>
+          <p class="brand-subtitle">parse() | format() | query() | diff()</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-theme" class="btn-icon" title="Toggle Theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mode Tabs -->
+      <nav class="mode-tabs">
+        <button class="mode-tab active" data-mode="format">Format</button>
+        <button class="mode-tab" data-mode="diff">Diff</button>
+        <button class="mode-tab" data-mode="query">Query</button>
+        <button class="mode-tab" data-mode="tools">Tools</button>
+      </nav>
+
+      <!-- Format Mode -->
+      <section id="section-format" class="section active">
+        <div class="editor-grid">
+          <!-- Input Panel -->
+          <div class="editor-panel">
+            <div class="panel-header">
+              <span class="panel-title">Input JSON</span>
+              <div class="panel-actions">
+                <button id="btn-clear-input" class="btn-sm" title="Clear">Clear</button>
+                <label class="btn-sm btn-file" title="Upload JSON file">
+                  <input type="file" id="file-input" accept=".json,.txt" hidden>
+                  Upload
+                </label>
+              </div>
+            </div>
+            <div class="editor-wrapper">
+              <textarea id="input-json" class="editor" placeholder="Paste your JSON here..."></textarea>
+            </div>
+            <div id="input-error" class="error-message"></div>
+          </div>
+
+          <!-- Output Panel -->
+          <div class="editor-panel">
+            <div class="panel-header">
+              <span class="panel-title">Output</span>
+              <div class="panel-actions">
+                <button id="btn-copy" class="btn-sm btn-primary" title="Copy to clipboard">Copy</button>
+                <button id="btn-download" class="btn-sm" title="Download as JSON file">Download</button>
+              </div>
+            </div>
+            <div class="editor-wrapper">
+              <pre id="output-json" class="editor output-editor"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions-bar">
+          <div class="actions-left">
+            <button id="btn-format" class="btn btn-primary">Format</button>
+            <button id="btn-minify" class="btn">Minify</button>
+            <button id="btn-validate" class="btn">Validate</button>
+            <div class="dropdown">
+              <button class="btn dropdown-toggle" id="btn-convert">Convert ▼</button>
+              <div class="dropdown-menu">
+                <button class="dropdown-item" data-convert="yaml">JSON → YAML</button>
+                <button class="dropdown-item" data-convert="xml">JSON → XML</button>
+                <button class="dropdown-item" data-convert="typescript">JSON → TypeScript</button>
+                <button class="dropdown-item" data-convert="python">JSON → Python</button>
+                <button class="dropdown-item" data-convert="schema">JSON → JSON Schema</button>
+              </div>
+            </div>
+            <button id="btn-sort-keys" class="btn">Sort Keys</button>
+          </div>
+          <div class="actions-right">
+            <label class="input-group">
+              <span>Indent:</span>
+              <select id="indent-select">
+                <option value="2">2 spaces</option>
+                <option value="4">4 spaces</option>
+                <option value="tab">Tab</option>
+              </select>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="auto-format">
+              <span>Auto-format</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Statistics -->
+        <div id="stats-panel" class="stats-panel">
+          <span class="stats-title">JSON Statistics</span>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Lines</span>
+              <span class="stat-value" id="stat-lines">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Characters</span>
+              <span class="stat-value" id="stat-chars">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Keys</span>
+              <span class="stat-value" id="stat-keys">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Max Depth</span>
+              <span class="stat-value" id="stat-depth">0</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Diff Mode -->
+      <section id="section-diff" class="section">
+        <div class="editor-grid">
+          <div class="editor-panel">
+            <div class="panel-header">
+              <span class="panel-title">JSON 1</span>
+            </div>
+            <div class="editor-wrapper diff-editor-wrapper">
+              <pre id="diff-highlight-1" class="diff-highlight-layer" aria-hidden="true"></pre>
+              <textarea id="diff-input-1" class="editor" placeholder="Paste first JSON..." wrap="off"></textarea>
+            </div>
+          </div>
+          <div class="editor-panel">
+            <div class="panel-header">
+              <span class="panel-title">JSON 2</span>
+            </div>
+            <div class="editor-wrapper diff-editor-wrapper">
+              <pre id="diff-highlight-2" class="diff-highlight-layer" aria-hidden="true"></pre>
+              <textarea id="diff-input-2" class="editor" placeholder="Paste second JSON..." wrap="off"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="actions-bar">
+          <button id="btn-diff" class="btn btn-primary">Compare</button>
+          <button id="btn-swap-diff" class="btn">Swap</button>
+          <button id="btn-clear-diff" class="btn">Clear</button>
+        </div>
+        <div class="diff-output">
+          <div class="panel-header">
+            <span class="panel-title">Differences</span>
+          </div>
+          <div id="diff-result" class="diff-result"></div>
+        </div>
+      </section>
+
+      <!-- Query Mode -->
+      <section id="section-query" class="section">
+        <div class="editor-grid">
+          <div class="editor-panel">
+            <div class="panel-header">
+              <span class="panel-title">Input JSON</span>
+            </div>
+            <div class="editor-wrapper">
+              <textarea id="query-input" class="editor" placeholder="Paste your JSON..."></textarea>
+            </div>
+          </div>
+          <div class="editor-panel">
+            <div class="panel-header">
+              <span class="panel-title">Query Result</span>
+            </div>
+            <div class="editor-wrapper">
+              <pre id="query-output" class="editor output-editor"></pre>
+            </div>
+          </div>
+        </div>
+        <div class="actions-bar">
+          <div class="query-input-group">
+            <label for="jsonpath-input">JSONPath:</label>
+            <input type="text" id="jsonpath-input" class="text-input" placeholder="$.store.book[0].title" value="$">
+            <button id="btn-query" class="btn btn-primary">Query</button>
+          </div>
+        </div>
+        <div class="query-examples">
+          <span class="examples-title">Examples:</span>
+          <code class="example-link">$</code>
+          <code class="example-link">$.key</code>
+          <code class="example-link">$[0]</code>
+          <code class="example-link">$.*</code>
+          <code class="example-link">$.store.book[*].title</code>
+        </div>
+      </section>
+
+      <!-- Tools Mode -->
+      <section id="section-tools" class="section">
+        <div class="tools-grid">
+          <!-- URL Encode/Decode -->
+          <div class="tool-card">
+            <h3 class="tool-title">URL Encode/Decode</h3>
+            <textarea id="url-input" class="tool-textarea" placeholder="Enter text..."></textarea>
+            <div class="tool-actions">
+              <button class="btn btn-sm" data-tool="url-encode">Encode</button>
+              <button class="btn btn-sm" data-tool="url-decode">Decode</button>
+              <button class="btn btn-sm" data-tool="copy-url">Copy</button>
+            </div>
+          </div>
+
+          <!-- Base64 Encode/Decode -->
+          <div class="tool-card">
+            <h3 class="tool-title">Base64 Encode/Decode</h3>
+            <textarea id="base64-input" class="tool-textarea" placeholder="Enter text..."></textarea>
+            <div class="tool-actions">
+              <button class="btn btn-sm" data-tool="base64-encode">Encode</button>
+              <button class="btn btn-sm" data-tool="base64-decode">Decode</button>
+              <button class="btn btn-sm" data-tool="copy-base64">Copy</button>
+            </div>
+          </div>
+
+          <!-- Escape/Unescape -->
+          <div class="tool-card">
+            <h3 class="tool-title">String Escape/Unescape</h3>
+            <textarea id="escape-input" class="tool-textarea" placeholder="Enter text..."></textarea>
+            <div class="tool-actions">
+              <button class="btn btn-sm" data-tool="escape">Escape</button>
+              <button class="btn btn-sm" data-tool="unescape">Unescape</button>
+              <button class="btn btn-sm" data-tool="copy-escape">Copy</button>
+            </div>
+          </div>
+
+          <!-- JSON to String -->
+          <div class="tool-card">
+            <h3 class="tool-title">JSON ↔ String</h3>
+            <textarea id="jsonstring-input" class="tool-textarea" placeholder="Enter JSON or string..."></textarea>
+            <div class="tool-actions">
+              <button class="btn btn-sm" data-tool="json-to-string">JSON → String</button>
+              <button class="btn btn-sm" data-tool="string-to-json">String → JSON</button>
+              <button class="btn btn-sm" data-tool="copy-jsonstring">Copy</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
